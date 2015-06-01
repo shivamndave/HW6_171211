@@ -49,11 +49,11 @@ public class MyServiceTask implements Runnable {
                             if (Math.abs(_accely) > .5 || Math.abs(_accelx) > .5) {
 //                                Log.e("Log_Tag", Float.toString(_accely));
                                 T1 = new Date().getTime();
-//                                if (T1 - T0 > 10000) {
+                                if (T1 - T0 > 10000) {
                                     first_accel_time = new AtomicLong(T1).longValue();
                                     moved = true;
 //                                    Log.e(Log_Tag, Long.toString(first_accel_time));
-//                                }
+                                }
                             }
 
 
