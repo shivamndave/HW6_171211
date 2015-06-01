@@ -90,21 +90,21 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
-        if (serviceBound) {
-            Log.i("MyService", "Unbinding");
-            unbindService(serviceConnection);
-            serviceBound = false;
-            // If we like, stops the service.
-            if (true) {
-                Log.i(LOG_TAG, "Stopping.");
-                Intent intent = new Intent(this, MyService.class);
-                stopService(intent);
-                Log.i(LOG_TAG, "Stopped.");
-            }
-        }
-        if (EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().unregister(this);
-        }
+//        if (serviceBound) {
+//            Log.i("MyService", "Unbinding");
+//            unbindService(serviceConnection);
+//            serviceBound = false;
+//            // If we like, stops the service.
+//            if (true) {
+//                Log.i(LOG_TAG, "Stopping.");
+//                Intent intent = new Intent(this, MyService.class);
+//                stopService(intent);
+//                Log.i(LOG_TAG, "Stopped.");
+//            }
+//        }
+//        if (EventBus.getDefault().isRegistered(this)) {
+//            EventBus.getDefault().unregister(this);
+//        }
         super.onPause();
     }
 
@@ -116,7 +116,7 @@ public class MainActivity extends Activity {
         Long countTime = new Date().getTime() - result.startValue ;
 
         if (movedQ) {
-            tv.setText("Your phone was moved " + Long.toString(((new Date().getTime()) - result.lngValue)/1000) + "seconds ago.");
+            tv.setText("Your phone was moved " + Long.toString(((new Date().getTime()) - result.lngValue)/1000) + " seconds ago.");
         }else if (countTime < 10000){
             tv.setText("Engaging in: " + Long.toString((10000 - countTime)/1000) + " second(s)...");
         } else {
