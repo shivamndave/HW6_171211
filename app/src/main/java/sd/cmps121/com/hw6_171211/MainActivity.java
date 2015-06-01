@@ -15,16 +15,12 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import java.util.Date;
+
 import de.greenrobot.event.EventBus;
 import sd.cmps121.com.hw6_171211.MyService.MyBinder;
 
 public class MainActivity extends Activity {
-
-    public static final int DISPLAY_NUMBER = 10;
-    private Handler mUiHandler;
-    private SurfaceView mSurfaceView;
-    private SurfaceHolder mSurfaceHolder;
-    private Rect mSurfaceSize;
 
     private static final String LOG_TAG = "MainActivity";
 
@@ -43,6 +39,17 @@ public class MainActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 
     }
+
+//    public boolean didItMove() {
+//        Date d = new Date();
+//        boolean moved = false;
+//        synchronized (myLock) {
+//            if (first_accel_time != null && d - first_accel_time > 30 seconds){
+//                moved = true;
+//            }
+//        }
+//        return moved;
+//    }
 
     @Override
     protected void onResume() {
