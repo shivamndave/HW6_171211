@@ -9,8 +9,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import sd.cmps121.com.hw6_171211.MyServiceTask.ResultCallback;
-
 public class MyService extends Service {
 
     private static final String LOG_TAG = "MyService";
@@ -80,20 +78,6 @@ public class MyService extends Service {
         // Stops the motion detector.
         myTask.stopProcessing();
         Log.i(LOG_TAG, "Stopped.");
-    }
-
-    // Interface to be able to subscribe to the bitmaps by the service.
-
-    public void releaseResult(ServiceResult result) {
-        myTask.releaseResult(result);
-    }
-
-    public void addResultCallback(ResultCallback resultCallback) {
-        myTask.addResultCallback(resultCallback);
-    }
-
-    public void removeResultCallback(ResultCallback resultCallback) {
-        myTask.removeResultCallback(resultCallback);
     }
 
     // Interface which sets recording on/off.

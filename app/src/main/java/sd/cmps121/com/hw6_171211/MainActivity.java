@@ -9,17 +9,16 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import de.greenrobot.event.EventBus;
 import sd.cmps121.com.hw6_171211.MyService.MyBinder;
 
-public class MainActivity extends Activity
-        implements sd.cmps121.com.hw6_171211.MyServiceTask.ResultCallback {
+public class MainActivity extends Activity {
 
     public static final int DISPLAY_NUMBER = 10;
     private Handler mUiHandler;
@@ -37,7 +36,6 @@ public class MainActivity extends Activity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mUiHandler = new Handler(getMainLooper(), new UiCallback());
         serviceBound = false;
         // Prevents the screen from dimming and going to sleep.
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -53,6 +51,10 @@ public class MainActivity extends Activity
         Intent intent = new Intent(this, MyService.class);
         startService(intent);
         bindMyService();
+
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
     }
 
     private void bindMyService() {
@@ -74,9 +76,6 @@ public class MainActivity extends Activity
             MyBinder binder = (MyBinder) serviceBinder;
             myService = binder.getService();
             serviceBound = true;
-            // Let's connect the callbacks.
-            Log.i("MyService", "Bound succeeded, adding the callback");
-            myService.addResultCallback(MainActivity.this);
         }
 
         @Override
@@ -88,9 +87,6 @@ public class MainActivity extends Activity
     @Override
     protected void onPause() {
         if (serviceBound) {
-            if (myService != null) {
-                myService.removeResultCallback(this);
-            }
             Log.i("MyService", "Unbinding");
             unbindService(serviceConnection);
             serviceBound = false;
@@ -102,51 +98,18 @@ public class MainActivity extends Activity
                 Log.i(LOG_TAG, "Stopped.");
             }
         }
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
         super.onPause();
     }
 
-    /**
-     * This function is called from the service thread.  To process this, we need
-     * to create a message for a handler in the UI thread.
-     */
-    @Override
-    public void onResultReady(ServiceResult result) {
-        if (result != null) {
-            Log.i(LOG_TAG, "Preparing a message for " + result.intValue);
-        } else {
-            Log.e(LOG_TAG, "Received an empty result!");
-        }
-        mUiHandler.obtainMessage(DISPLAY_NUMBER, result).sendToTarget();
+    public void onEventMainThread(ServiceResult result) {
+        Log.i(LOG_TAG, "Displaying: " + result.intValue);
+        TextView tv = (TextView) findViewById(R.id.number_view);
+        tv.setText(Integer.toString(result.intValue));
     }
-
-    /**
-     * This Handler callback gets the message generated above.
-     * It is used to display the integer on the screen.
-     */
-    private class UiCallback implements Handler.Callback {
-        @Override
-        public boolean handleMessage(Message message) {
-            if (message.what == DISPLAY_NUMBER) {
-                // Gets the result.
-                ServiceResult result = (ServiceResult) message.obj;
-                // Displays it.
-                if (result != null) {
-                    Log.i(LOG_TAG, "Displaying: " + result.intValue);
-                    TextView tv = (TextView) findViewById(R.id.number_view);
-                    tv.setText(Integer.toString(result.intValue));
-                    // Tell the worker that the bitmap is ready to be reused
-                    if (serviceBound && myService != null) {
-                        Log.i(LOG_TAG, "Releasing result holder for " + result.intValue);
-                        myService.releaseResult(result);
-                    }
-                } else {
-                    Log.e(LOG_TAG, "Error: received empty message!");
-                }
-            }
-            return true;
-        }
-    }
-
-
-
 }
+
+
+
