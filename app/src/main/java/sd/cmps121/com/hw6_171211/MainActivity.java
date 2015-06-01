@@ -5,22 +5,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Rect;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.WindowManager;
 import android.widget.TextView;
 
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicLong;
 
 import de.greenrobot.event.EventBus;
 import sd.cmps121.com.hw6_171211.MyService.MyBinder;
@@ -32,14 +23,6 @@ public class MainActivity extends Activity {
     // Service connection variables.
     private boolean serviceBound;
     private MyService myService;
-
-    private Long T1;
-    private Long T0;
-
-    private float _accelx;
-    private float _accely;
-
-    private Long first_accel_time;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,40 +36,11 @@ public class MainActivity extends Activity {
 
     }
 
-    public boolean didItMove() {
+    public boolean didItMove(ServiceResult tempRes) {
         Date d = new Date();
-        movement();
         boolean moved = false;
-        if (first_accel_time != null) {
-            moved = true;
-        }
-        return moved;
-    }
-
-    protected boolean movement() {
-        return ((SensorManager) getSystemService(Context.SENSOR_SERVICE)).registerListener(
-                new SensorEventListener() {
-                    @Override
-                    public void onSensorChanged(SensorEvent event) {
-                        _accelx = -event.values[0];
-                        _accely = event.values[1];
-
-                        if (Math.abs(_accely) > 0.1 || Math.abs(_accelx) > 0.1) {
-//                            if (T1 - T0 > 30000) {
-                                T1 = new Date().getTime();
-                                first_accel_time = new AtomicLong(T1).longValue();
-//                            }
-                        }
-
-
-                    }
-
-                    @Override
-                    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-                    } //ignore
-                },
-                ((SensorManager) getSystemService(Context.SENSOR_SERVICE))
-                        .getSensorList(Sensor.TYPE_ACCELEROMETER).get(0), SensorManager.SENSOR_DELAY_GAME);
+        long firstAccTime = tempRes.lngValue;
+        return tempRes.boolValue;
     }
 
     @Override
@@ -150,12 +104,13 @@ public class MainActivity extends Activity {
     }
 
     public void onEventMainThread(ServiceResult result) {
-        Log.i(LOG_TAG, "Displaying: " + result.intValue);
+        Date d = new Date();
+        Log.i("RALFP", "Displaying: " + result.boolValue);
         TextView tv = (TextView) findViewById(R.id.number_view);
-        if (didItMove()) {
+        if (result.boolValue == true && result.lngValue != 0L && d.getTime() - result.lngValue > 10000) {
             tv.setText("YAH BRUH BRUH");
-        } else {
-            tv.setText("NAH");
+        }else{
+            tv.setText("NAH" + result.boolValue.toString());
         }
     }
 }

@@ -6,5 +6,6 @@ package sd.cmps121.com.hw6_171211;
 public class ServiceResult {
     ServiceResult() {}
 
-    public int intValue;
+    public long lngValue;
+    public Boolean boolValue;
 }
