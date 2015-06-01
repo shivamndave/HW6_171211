@@ -7,5 +7,6 @@ public class ServiceResult {
     ServiceResult() {}
 
     public long lngValue;
+    public long startValue;
     public Boolean boolValue;
 }

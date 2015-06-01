@@ -78,6 +78,7 @@ public class MyServiceTask implements Runnable {
             // is running).
             ServiceResult result = new ServiceResult();
             result.lngValue = first_accel_time;
+            result.startValue = T0;
             result.boolValue = moved;
             EventBus.getDefault().post(result);
         }

@@ -40,7 +40,12 @@ public class MainActivity extends Activity {
         Date d = new Date();
         boolean moved = false;
         long firstAccTime = tempRes.lngValue;
-        return tempRes.boolValue;
+
+        if(tempRes.boolValue == true && tempRes.lngValue != 0L && d.getTime() - firstAccTime > 10000){
+            moved = true;
+        }
+
+        return moved;
     }
 
     @Override
@@ -104,13 +109,18 @@ public class MainActivity extends Activity {
     }
 
     public void onEventMainThread(ServiceResult result) {
-        Date d = new Date();
-        Log.i("RALFP", "Displaying: " + result.boolValue);
         TextView tv = (TextView) findViewById(R.id.number_view);
-        if (result.boolValue == true && result.lngValue != 0L && d.getTime() - result.lngValue > 10000) {
-            tv.setText("YAH BRUH BRUH");
-        }else{
-            tv.setText("NAH" + result.boolValue.toString());
+
+        Boolean movedQ = didItMove(result);
+
+        Long countTime = new Date().getTime() - result.startValue ;
+
+        if (movedQ) {
+            tv.setText("Your phone was moved " + Long.toString(((new Date().getTime()) - result.lngValue)/1000) + "seconds ago.");
+        }else if (countTime < 10000){
+            tv.setText("Engaging in: " + Long.toString((10000 - countTime)/1000) + " second(s)...");
+        } else {
+            tv.setText("App Engaged for: " + Long.toString((countTime - 10000)/1000) + " seconds...");
         }
     }
 }
