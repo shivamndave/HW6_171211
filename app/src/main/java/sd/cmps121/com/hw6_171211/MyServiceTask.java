@@ -3,12 +3,8 @@ package sd.cmps121.com.hw6_171211;
 import android.content.Context;
 import android.util.Log;
 
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.Date;
 import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import de.greenrobot.event.EventBus;
 
 public class MyServiceTask implements Runnable {
@@ -16,11 +12,11 @@ public class MyServiceTask implements Runnable {
     public static final String LOG_TAG = "MyService";
     private boolean running;
     private Context context;
-
+    private Long T0;
 
     public MyServiceTask(Context _context) {
         context = _context;
-        // Put here what to do at creation.
+        setT0();
     }
 
     @Override
@@ -51,5 +47,13 @@ public class MyServiceTask implements Runnable {
 
     public void setTaskState(boolean b) {
         // Do something with b.
+    }
+
+    public void setT0() {
+        T0 = new Date().getTime();
+    }
+
+    public long getT0() {
+        return T0;
     }
 }
