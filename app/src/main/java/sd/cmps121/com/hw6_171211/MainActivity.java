@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
@@ -41,7 +42,7 @@ public class MainActivity extends Activity {
         boolean moved = false;
         long firstAccTime = tempRes.lngValue;
 
-        if(tempRes.boolValue == true && tempRes.lngValue != 0L && d.getTime() - firstAccTime > 10000){
+        if (tempRes.boolValue == true && tempRes.lngValue != 0L && d.getTime() - firstAccTime > 10000) {
             moved = true;
         }
 
@@ -90,22 +91,52 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
-//        if (serviceBound) {
-//            Log.i("MyService", "Unbinding");
-//            unbindService(serviceConnection);
-//            serviceBound = false;
-//            // If we like, stops the service.
-//            if (true) {
-//                Log.i(LOG_TAG, "Stopping.");
-//                Intent intent = new Intent(this, MyService.class);
-//                stopService(intent);
-//                Log.i(LOG_TAG, "Stopped.");
-//            }
-//        }
-//        if (EventBus.getDefault().isRegistered(this)) {
-//            EventBus.getDefault().unregister(this);
-//        }
         super.onPause();
+    }
+
+    public void onClearClick(View v) {
+        if (serviceBound) {
+            Log.i("MyService", "Unbinding");
+            unbindService(serviceConnection);
+            serviceBound = false;
+            // If we like, stops the service.
+            if (true) {
+                Log.i(LOG_TAG, "Stopping.");
+                Intent intent = new Intent(this, MyService.class);
+                stopService(intent);
+                Log.i(LOG_TAG, "Stopped.");
+            }
+        }
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
+
+        Intent intent = new Intent(this, MyService.class);
+        startService(intent);
+        bindMyService();
+
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
+    }
+
+    public void onExitClick(View v) {
+        if (serviceBound) {
+            Log.i("MyService", "Unbinding");
+            unbindService(serviceConnection);
+            serviceBound = false;
+            // If we like, stops the service.
+            if (true) {
+                Log.i(LOG_TAG, "Stopping.");
+                Intent intent = new Intent(this, MyService.class);
+                stopService(intent);
+                Log.i(LOG_TAG, "Stopped.");
+            }
+        }
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
+        System.exit(0);
     }
 
     public void onEventMainThread(ServiceResult result) {
@@ -113,14 +144,14 @@ public class MainActivity extends Activity {
 
         Boolean movedQ = didItMove(result);
 
-        Long countTime = new Date().getTime() - result.startValue ;
+        Long countTime = new Date().getTime() - result.startValue;
 
         if (movedQ) {
-            tv.setText("Your phone was moved " + Long.toString(((new Date().getTime()) - result.lngValue)/1000) + " seconds ago.");
-        }else if (countTime < 10000){
-            tv.setText("Engaging in: " + Long.toString((10000 - countTime)/1000) + " second(s)...");
+            tv.setText("Your phone was moved " + Long.toString(((new Date().getTime()) - result.lngValue) / 1000) + " seconds ago.");
+        } else if (countTime < 10000) {
+            tv.setText("Engaging in: " + Long.toString((10000 - countTime) / 1000) + " second(s)...");
         } else {
-            tv.setText("App Engaged for: " + Long.toString((countTime - 10000)/1000) + " seconds...");
+            tv.setText("App Engaged for: " + Long.toString((countTime - 10000) / 1000) + " seconds...");
         }
     }
 }

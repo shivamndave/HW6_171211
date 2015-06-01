@@ -8,21 +8,22 @@
     <TextView
         android:id="@+id/number_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:layout_height="wrap_content" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:text="Clear"/>
+        android:text="Clear"
+        android:onClick="onClearClick"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:text="Exit"/>
+        android:text="Exit"
+        android:onClick="onExitClick"/>
 
 </RelativeLayout>
