@@ -27,6 +27,7 @@ public class MainActivity extends Activity {
     private MyService myService;
     private boolean moved;
     private Long dateMoved = 0L;
+    private AtomicLong firstAccTime;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,6 +35,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         serviceBound = false;
         moved = false;
+        firstAccTime = null;
         // Prevents the screen from dimming and going to sleep.
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
@@ -43,7 +45,8 @@ public class MainActivity extends Activity {
 
     public boolean didItMove(ServiceResult tempRes) {
         Date d = new Date();
-        AtomicLong firstAccTime = tempRes.lngValue;
+        firstAccTime = tempRes.lngValue;
+//        Log.e("RTXD", Boolean.toString(moved) + firstAccTime.toString());
             if (tempRes.lngValue != null && moved == false) {
                 if (d.getTime() - firstAccTime.longValue() > 10000) {
                     dateMoved = firstAccTime.longValue();
@@ -104,6 +107,9 @@ public class MainActivity extends Activity {
     }
 
     public void onClearClick(View v) {
+        myService.clearTask();
+        moved = false;
+        firstAccTime = null;
     }
 
     public void onExitClick(View v) {
@@ -127,7 +133,6 @@ public class MainActivity extends Activity {
 
     public void onEventMainThread(ServiceResult result) {
         TextView tv = (TextView) findViewById(R.id.number_view);
-
         Boolean movedQ = didItMove(result);
 
         Long countTime = new Date().getTime() - result.startValue;

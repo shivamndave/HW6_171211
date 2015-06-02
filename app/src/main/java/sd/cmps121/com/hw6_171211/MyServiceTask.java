@@ -19,11 +19,11 @@ public class MyServiceTask implements Runnable {
     private boolean running;
     private Context context;
 
-    private Long T1;
+    private Long T1 = 0L;
+    private Long T0 = 0L;
     private float _accelx;
     private float _accely;
-    private Long T0 = 0L;
-    private AtomicLong first_accel_time = null;
+    private AtomicLong first_accel_time;
 
     public MyServiceTask(Context _context) {
         context = _context;
@@ -75,5 +75,12 @@ public class MyServiceTask implements Runnable {
     public void setTaskState(boolean b) {
         // Do something with b.
     }
+
+    public void clearMyServiceTask(){
+        T1 = 0L;
+        T0 = new Date().getTime();
+        first_accel_time = null;
+    }
+
 
 }

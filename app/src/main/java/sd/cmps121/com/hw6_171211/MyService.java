@@ -52,6 +52,10 @@ public class MyService extends Service {
         myThread.start();
     }
 
+    public void clearTask(){
+        myTask.clearMyServiceTask();
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
         Log.i(LOG_TAG, "Service is being bound");
@@ -80,12 +84,6 @@ public class MyService extends Service {
     @Override
     public void onDestroy() {
         wakeLock.release();
-        // Cancel the persistent notification.
-//        notificationManager.cancel(ONGOING_NOTIFICATION_ID);
-//        Log.i(LOG_TAG, "Stopping.");
-//        // Stops the motion detector.
-//        myTask.stopProcessing();
-//        Log.i(LOG_TAG, "Stopped.");
     }
 
     // Interface which sets recording on/off.
