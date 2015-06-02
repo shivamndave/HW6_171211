@@ -22,6 +22,8 @@ public class MainActivity extends Activity {
 
     private static final String LOG_TAG = "MainActivity";
 
+    private int CAP_TIME = 10000;
+
     // Service connection variables.
     private boolean serviceBound;
     private MyService myService;
@@ -47,12 +49,12 @@ public class MainActivity extends Activity {
         Date d = new Date();
         firstAccTime = tempRes.lngValue;
 //        Log.e("RTXD", Boolean.toString(moved) + firstAccTime.toString());
-            if (tempRes.lngValue != null && moved == false) {
-                if (d.getTime() - firstAccTime.longValue() > 10000) {
-                    dateMoved = firstAccTime.longValue();
-                    moved = true;
-                }
+        if (tempRes.lngValue != null && moved == false) {
+            if (d.getTime() - firstAccTime.longValue() > CAP_TIME) {
+                dateMoved = firstAccTime.longValue();
+                moved = true;
             }
+        }
         return moved;
     }
 
@@ -132,17 +134,34 @@ public class MainActivity extends Activity {
     }
 
     public void onEventMainThread(ServiceResult result) {
-        TextView tv = (TextView) findViewById(R.id.number_view);
+        TextView tv = (TextView) findViewById(R.id.status_view);
         Boolean movedQ = didItMove(result);
 
         Long countTime = new Date().getTime() - result.startValue;
 
         if (movedQ) {
-            tv.setText("Your device was moved "  + Long.toString(((new Date().getTime()) - dateMoved) / 1000) + " seconds ago!");
-        } else if (countTime < 10000) {
-            tv.setText("App will start detecting in: " + Long.toString((10000 - countTime) / 1000) + " second(s)...");
+            Long seconds = ((new Date().getTime()) - dateMoved) / 1000;
+            Long minutes = seconds / 60;
+            Long minSeconds = seconds - minutes * 60;
+
+            if (seconds < 60) {
+                tv.setText("Your device was moved\n" + Long.toString(seconds) + " seconds ago!");
+            } else {
+                tv.setText("Your device was moved\n" + Long.toString(minutes) + " minute(s) and " + Long.toString(minSeconds) + " second(s) ago!");
+            }
+        } else if (countTime < CAP_TIME) {
+            Long seconds = (CAP_TIME - countTime) / 1000;
+            tv.setText("App will start detecting in\n" + Long.toString(seconds) + " second(s)...");
         } else {
-            tv.setText("Your device has been quiet for: " + Long.toString((countTime - 10000) / 1000) + " seconds...");
+            Long seconds = (countTime - CAP_TIME) / 1000;
+            Long minutes = seconds / 60;
+            Long minSeconds = seconds - minutes * 60;
+
+            if (seconds < 60) {
+                tv.setText("Your device has been quiet for\n" + Long.toString(seconds) + " second(s)...");
+            } else {
+                tv.setText("Your device has been quiet for\n" + Long.toString(minutes) + " minute(s) and " + Long.toString(minSeconds) + " second(s) ago!");
+            }
         }
     }
 }

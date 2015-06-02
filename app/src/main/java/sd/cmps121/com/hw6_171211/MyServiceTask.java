@@ -19,6 +19,8 @@ public class MyServiceTask implements Runnable {
     private boolean running;
     private Context context;
 
+    private int CAP_TIME = 10000;
+
     private Long T1 = 0L;
     private Long T0 = 0L;
     private float _accelx;
@@ -42,7 +44,7 @@ public class MyServiceTask implements Runnable {
                             _accely = event.values[1];
                             if (Math.abs(_accely) > .5 || Math.abs(_accelx) > .5) {
                                 T1 = new Date().getTime();
-                                if (T1 - T0 > 10000) {
+                                if (T1 - T0 > CAP_TIME) {
                                     first_accel_time = new AtomicLong(T1);
                                 }
                             }
