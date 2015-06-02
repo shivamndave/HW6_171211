@@ -13,6 +13,7 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicLong;
 
 import de.greenrobot.event.EventBus;
 import sd.cmps121.com.hw6_171211.MyService.MyBinder;
@@ -24,12 +25,15 @@ public class MainActivity extends Activity {
     // Service connection variables.
     private boolean serviceBound;
     private MyService myService;
+    private boolean moved;
+    private Long dateMoved = 0L;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         serviceBound = false;
+        moved = false;
         // Prevents the screen from dimming and going to sleep.
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
@@ -39,13 +43,13 @@ public class MainActivity extends Activity {
 
     public boolean didItMove(ServiceResult tempRes) {
         Date d = new Date();
-        boolean moved = false;
-        long firstAccTime = tempRes.lngValue;
-
-        if (tempRes.boolValue == true && tempRes.lngValue != 0L && d.getTime() - firstAccTime > 10000) {
-            moved = true;
-        }
-
+        AtomicLong firstAccTime = tempRes.lngValue;
+            if (tempRes.lngValue != null) {
+                if (d.getTime() - firstAccTime.longValue() > 10000) {
+                    dateMoved = firstAccTime.longValue();
+                    moved = true;
+                }
+            }
         return moved;
     }
 
@@ -91,33 +95,15 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
-        super.onPause();
-    }
-
-    public void onClearClick(View v) {
         if (serviceBound) {
             Log.i("MyService", "Unbinding");
             unbindService(serviceConnection);
             serviceBound = false;
-            // If we like, stops the service.
-            if (true) {
-                Log.i(LOG_TAG, "Stopping.");
-                Intent intent = new Intent(this, MyService.class);
-                stopService(intent);
-                Log.i(LOG_TAG, "Stopped.");
-            }
         }
-        if (EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().unregister(this);
-        }
+        super.onPause();
+    }
 
-        Intent intent = new Intent(this, MyService.class);
-        startService(intent);
-        bindMyService();
-
-        if (!EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().register(this);
-        }
+    public void onClearClick(View v) {
     }
 
     public void onExitClick(View v) {
@@ -147,11 +133,11 @@ public class MainActivity extends Activity {
         Long countTime = new Date().getTime() - result.startValue;
 
         if (movedQ) {
-            tv.setText("Your phone was moved " + Long.toString(((new Date().getTime()) - result.lngValue) / 1000) + " seconds ago.");
+            tv.setText("Your device was moved "  + Long.toString(((new Date().getTime()) - dateMoved) / 1000) + " seconds ago!");
         } else if (countTime < 10000) {
-            tv.setText("Engaging in: " + Long.toString((10000 - countTime) / 1000) + " second(s)...");
+            tv.setText("App will start detecting in: " + Long.toString((10000 - countTime) / 1000) + " second(s)...");
         } else {
-            tv.setText("App Engaged for: " + Long.toString((countTime - 10000) / 1000) + " seconds...");
+            tv.setText("Your device has been quiet for: " + Long.toString((countTime - 10000) / 1000) + " seconds...");
         }
     }
 }

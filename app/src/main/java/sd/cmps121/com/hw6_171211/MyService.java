@@ -81,11 +81,11 @@ public class MyService extends Service {
     public void onDestroy() {
         wakeLock.release();
         // Cancel the persistent notification.
-        notificationManager.cancel(ONGOING_NOTIFICATION_ID);
-        Log.i(LOG_TAG, "Stopping.");
-        // Stops the motion detector.
-        myTask.stopProcessing();
-        Log.i(LOG_TAG, "Stopped.");
+//        notificationManager.cancel(ONGOING_NOTIFICATION_ID);
+//        Log.i(LOG_TAG, "Stopping.");
+//        // Stops the motion detector.
+//        myTask.stopProcessing();
+//        Log.i(LOG_TAG, "Stopped.");
     }
 
     // Interface which sets recording on/off.
