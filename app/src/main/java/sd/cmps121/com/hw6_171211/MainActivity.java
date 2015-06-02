@@ -22,7 +22,7 @@ public class MainActivity extends Activity {
 
     private static final String LOG_TAG = "MainActivity";
 
-    private int CAP_TIME = 10000;
+    private int CAP_TIME = 30000;
 
     // Service connection variables.
     private boolean serviceBound;
@@ -53,7 +53,7 @@ public class MainActivity extends Activity {
     public boolean didItMove(ServiceResult tempRes) {
         Date d = new Date();
         firstAccTime = tempRes.lngValue;
-        if (tempRes.lngValue != null && moved == false) {
+        if (tempRes.lngValue != null && !moved) {
             if (d.getTime() - firstAccTime.longValue() > CAP_TIME) {
                 dateMoved = firstAccTime.longValue();
                 moved = true;
@@ -140,13 +140,11 @@ public class MainActivity extends Activity {
             Log.i("MyService", "Unbinding");
             unbindService(serviceConnection);
             serviceBound = false;
-            // If we like, stops the service.
-            if (true) {
-                Log.i(LOG_TAG, "Stopping.");
-                Intent intent = new Intent(this, MyService.class);
-                stopService(intent);
-                Log.i(LOG_TAG, "Stopped.");
-            }
+            // Stops the service.
+            Log.i(LOG_TAG, "Stopping.");
+            Intent intent = new Intent(this, MyService.class);
+            stopService(intent);
+            Log.i(LOG_TAG, "Stopped.");
         }
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);

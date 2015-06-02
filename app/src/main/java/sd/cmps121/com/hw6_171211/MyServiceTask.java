@@ -17,7 +17,7 @@ public class MyServiceTask implements Runnable {
     private boolean running;
     private Context context;
 
-    private int CAP_TIME = 10000;
+    private int CAP_TIME = 30000;
 
     private Long T1 = 0L;
     private Long T0 = 0L;
