@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
     public boolean didItMove(ServiceResult tempRes) {
         Date d = new Date();
         AtomicLong firstAccTime = tempRes.lngValue;
-            if (tempRes.lngValue != null) {
+            if (tempRes.lngValue != null && moved == false) {
                 if (d.getTime() - firstAccTime.longValue() > 10000) {
                     dateMoved = firstAccTime.longValue();
                     moved = true;
