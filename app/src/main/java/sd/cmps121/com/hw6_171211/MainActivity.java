@@ -45,10 +45,14 @@ public class MainActivity extends Activity {
 
     }
 
+    /*
+     * Checks the movement and if it was done atleast the CAP_TIME (30 seconds) ago
+     * This also sets the dateMoved so that we can easily do the time count for when
+     * it was moved according to the current time.
+     */
     public boolean didItMove(ServiceResult tempRes) {
         Date d = new Date();
         firstAccTime = tempRes.lngValue;
-//        Log.e("RTXD", Boolean.toString(moved) + firstAccTime.toString());
         if (tempRes.lngValue != null && moved == false) {
             if (d.getTime() - firstAccTime.longValue() > CAP_TIME) {
                 dateMoved = firstAccTime.longValue();
@@ -58,6 +62,10 @@ public class MainActivity extends Activity {
         return moved;
     }
 
+    /*
+     * Initializes the new intent, starts/binds the service,
+     * and then registers the EventBus
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -98,6 +106,11 @@ public class MainActivity extends Activity {
         }
     };
 
+    /*
+     * During an onPause were only unbind the service, allowing it
+     * to run in the background
+     */
+
     @Override
     protected void onPause() {
         if (serviceBound) {
@@ -108,12 +121,20 @@ public class MainActivity extends Activity {
         super.onPause();
     }
 
+    /*
+     * Clears the current movement detection. This is a reset without actually resetting the
+     * app, it simply allows you to start redetecting easily
+     */
     public void onClearClick(View v) {
         myService.clearTask();
         moved = false;
         firstAccTime = null;
     }
 
+    /*
+     * The exit button function that is used to unbind the service, stop the service
+     * and then exit the app completely.
+     */
     public void onExitClick(View v) {
         if (serviceBound) {
             Log.i("MyService", "Unbinding");
@@ -133,12 +154,19 @@ public class MainActivity extends Activity {
         System.exit(0);
     }
 
+    /*
+     * Where the ServiceResult is grabbed and handled. Also calls didItMove to
+     * check if the device has moved. Based on what that returns it will let you know
+     * if the device will start detecting, is detecting, or has detected movement
+     * and the current time of that.
+     */
     public void onEventMainThread(ServiceResult result) {
         TextView tv = (TextView) findViewById(R.id.status_view);
-        Boolean movedQ = didItMove(result);
 
-        Long countTime = new Date().getTime() - result.startValue;
+        Boolean movedQ = didItMove(result); // Checks the movement
+        Long countTime = new Date().getTime() - result.startValue; // Gets the countdown until detection
 
+        // If movement was detected
         if (movedQ) {
             Long seconds = ((new Date().getTime()) - dateMoved) / 1000;
             Long minutes = seconds / 60;
@@ -149,9 +177,13 @@ public class MainActivity extends Activity {
             } else {
                 tv.setText("Your device was moved\n" + Long.toString(minutes) + " minute(s) and " + Long.toString(minSeconds) + " second(s) ago!");
             }
+
+            // If the device is not detecting yet, this is the countdown to that
         } else if (countTime < CAP_TIME) {
             Long seconds = (CAP_TIME - countTime) / 1000;
             tv.setText("App will start detecting in\n" + Long.toString(seconds) + " second(s)...");
+
+            // Any other case where the device has not moved
         } else {
             Long seconds = (countTime - CAP_TIME) / 1000;
             Long minutes = seconds / 60;
@@ -160,7 +192,7 @@ public class MainActivity extends Activity {
             if (seconds < 60) {
                 tv.setText("Your device has been quiet for\n" + Long.toString(seconds) + " second(s)...");
             } else {
-                tv.setText("Your device has been quiet for\n" + Long.toString(minutes) + " minute(s) and " + Long.toString(minSeconds) + " second(s) ago!");
+                tv.setText("Your device has been quiet for\n" + Long.toString(minutes) + " minute(s) and " + Long.toString(minSeconds) + " second(s).");
             }
         }
     }

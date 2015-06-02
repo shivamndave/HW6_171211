@@ -5,10 +5,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.Log;
 
 import java.util.Date;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.greenrobot.event.EventBus;
@@ -32,6 +30,12 @@ public class MyServiceTask implements Runnable {
         T0 = new Date().getTime();
     }
 
+    /*
+     * Consistently runs the sensor, where we check if the phone has moved at all.
+     * If it has, we set the first_accel_time and then pass that into the ServiceResult
+     * which is accested in MainActivity by onEventMainThread. In addition to passing
+     * that movement value, it will also pass when we began detecting (used to display time)
+     */
     @Override
     public void run() {
         running = true;
@@ -78,6 +82,11 @@ public class MyServiceTask implements Runnable {
         // Do something with b.
     }
 
+    /*
+     * Clears the ServiceTask by setting the T1 and T0 values anew and first_accel_time to null.
+     * This allows us to reset the clock and start detecting over again, as though the app just
+     * restarted.
+     */
     public void clearMyServiceTask(){
         T1 = 0L;
         T0 = new Date().getTime();

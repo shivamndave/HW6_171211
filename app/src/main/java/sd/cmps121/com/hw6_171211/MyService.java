@@ -52,6 +52,9 @@ public class MyService extends Service {
         myThread.start();
     }
 
+    /*
+     * Added to call to clear the service task from MainActivity
+     */
     public void clearTask(){
         myTask.clearMyServiceTask();
     }
